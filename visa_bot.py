@@ -5,7 +5,6 @@ import smtplib
 
 URL = "https://visacatcher.bot/appointments/london/czech%20republic"
 
-# 🔔 ENV VARIABLES (set in Railway)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
@@ -27,7 +26,7 @@ def send_email(msg):
         server.starttls()
         server.login(EMAIL, EMAIL_PASS)
 
-        message = f"Subject: Visa Appointment Alert\n\n{msg}"
+        message = f"Subject: Visa Alert\n\n{msg}"
         server.sendmail(EMAIL, EMAIL, message)
 
         server.quit()
@@ -42,6 +41,7 @@ def check_available():
 
 
 last_status = False
+alert_count = 0   # 👈 track alerts sent
 
 print("🚀 Bot started...")
 
@@ -49,17 +49,23 @@ while True:
     try:
         current = check_available()
 
-        if not last_status and current:
-            msg = f"🔥 APPOINTMENT AVAILABLE!\n\nBook now:\n{URL}"
+        if current:
+            if alert_count < 4:
+                msg = f"🔥 APPOINTMENT AVAILABLE!\n\n{URL}"
 
-            send_telegram(msg)
-            send_email(msg)
+                send_telegram(msg)
+                send_email(msg)
 
-            print("✅ ALERT SENT")
+                alert_count += 1
+                print(f"✅ ALERT SENT ({alert_count}/4)")
+
+        else:
+            # reset when not available again
+            alert_count = 0
 
         last_status = current
 
     except Exception as e:
         print("Error:", e)
 
-    time.sleep(5)  # check every 5 seconds
+    time.sleep(5)
