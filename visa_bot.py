@@ -69,7 +69,7 @@ while True:
 
                 print(f"✅ ALERT {i+1}/4 SENT")
 
-                time.sleep(10)  # gap between alerts
+                time.sleep(4)  # gap between alerts
 
     except Exception as e:
         print("Error:", e)
