@@ -1,6 +1,6 @@
 import smtplib
 
-EMAIL = "hamzam7071@gmail.com"
+EMAIL = "hamzam7072@gmail.com"
 EMAIL_PASS = "qliymwchabehihxu"
 
 try:
