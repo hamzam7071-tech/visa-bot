@@ -1,19 +1,15 @@
-import smtplib
+def send_email(msg):
+    try:
+        server = smtplib.SMTP("smtp.gmail.com", 587, timeout=10)
+        server.starttls()
+        server.login(EMAIL, EMAIL_PASS)
 
-EMAIL = "hamzam7072@gmail.com"
-EMAIL_PASS = "qliymwchabehihxu"
+        message = f"Subject: Visa Alert\n\n{msg}"
+        server.sendmail(EMAIL, EMAIL, message)
 
-try:
-    server = smtplib.SMTP("smtp.gmail.com", 587)
-    server.starttls()
-    server.login(EMAIL, EMAIL_PASS)
+        server.quit()
 
-    message = "Subject: Test Email\n\nEmail is working!"
-    server.sendmail(EMAIL, EMAIL, message)
+        print("📧 Email sent")
 
-    server.quit()
-
-    print("✅ Email sent successfully")
-
-except Exception as e:
-    print("❌ Error:", e)
+    except Exception as e:
+        print("❌ Email error:", e)
