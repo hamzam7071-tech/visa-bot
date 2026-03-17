@@ -5,12 +5,15 @@ import smtplib
 
 URL = "https://visacatcher.bot/appointments/london/czech%20republic"
 
-# 🔔 ENV VARIABLES (set in Railway)
+# 🔔 ENV VARIABLES (Railway)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 EMAIL = os.getenv("EMAIL")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
+
+last_content = ""
+alert_count = 0
 
 
 def send_telegram(msg):
@@ -36,19 +39,26 @@ def send_email(msg):
 
 
 def check_available():
+    global last_content
+
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(URL, headers=headers)
+    text = response.text
 
-    text = response.text.lower()
-
-    # 🔍 Better detection (adjust if needed)
-    if "no appointments" in text:
+    # First run → store baseline
+    if last_content == "":
+        last_content = text
+        print("Initialized baseline")
         return False
-    else:
+
+    # Detect change
+    if text != last_content:
+        last_content = text
+        print("Change detected!")
         return True
 
+    return False
 
-alert_count = 0
 
 print("🚀 Bot started...")
 
@@ -58,7 +68,7 @@ while True:
 
         if current:
             if alert_count < 4:
-                msg = f"🔥 APPOINTMENT AVAILABLE!\n\nBook now:\n{URL}"
+                msg = f"🔥 APPOINTMENT CHANGE DETECTED!\n\nCheck now:\n{URL}"
 
                 send_telegram(msg)
                 send_email(msg)
@@ -66,11 +76,11 @@ while True:
                 alert_count += 1
                 print(f"✅ ALERT SENT ({alert_count}/4)")
 
-                time.sleep(10)  # wait between alerts
+                time.sleep(10)  # spacing alerts
                 continue
 
         else:
-            # reset when not available again
+            # reset when no change
             alert_count = 0
 
     except Exception as e:
