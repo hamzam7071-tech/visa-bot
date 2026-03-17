@@ -5,13 +5,12 @@ import smtplib
 
 URL = "https://visacatcher.bot/appointments/london/netherlands"
 
+# 🔔 ENV VARIABLES (set in Railway)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
 EMAIL = os.getenv("EMAIL")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
-
-COUNT_FILE = "alert_count.txt"
 
 
 def send_telegram(msg):
@@ -28,7 +27,7 @@ def send_email(msg):
         server.starttls()
         server.login(EMAIL, EMAIL_PASS)
 
-        message = f"Subject: Visa Alert\n\n{msg}"
+        message = f"Subject: Visa Appointment Alert\n\n{msg}"
         server.sendmail(EMAIL, EMAIL, message)
 
         server.quit()
@@ -39,42 +38,40 @@ def send_email(msg):
 def check_available():
     headers = {"User-Agent": "Mozilla/5.0"}
     response = requests.get(URL, headers=headers)
-    return "Appointments Available!" in response.text
+
+    text = response.text.lower()
+
+    # 🔍 Better detection (adjust if needed)
+    if "no appointments" in text:
+        return False
+    else:
+        return True
 
 
-def get_count():
-    if not os.path.exists(COUNT_FILE):
-        return 0
-    with open(COUNT_FILE, "r") as f:
-        return int(f.read())
-
-
-def save_count(count):
-    with open(COUNT_FILE, "w") as f:
-        f.write(str(count))
-
+alert_count = 0
 
 print("🚀 Bot started...")
 
 while True:
     try:
         current = check_available()
-        alert_count = get_count()
 
         if current:
             if alert_count < 4:
-                msg = f"🔥 APPOINTMENT AVAILABLE!\n\n{URL}"
+                msg = f"🔥 APPOINTMENT AVAILABLE!\n\nBook now:\n{URL}"
 
                 send_telegram(msg)
                 send_email(msg)
 
                 alert_count += 1
-                save_count(alert_count)
-
                 print(f"✅ ALERT SENT ({alert_count}/4)")
+
+                time.sleep(10)  # wait between alerts
+                continue
+
         else:
-            # reset when not available
-            save_count(0)
+            # reset when not available again
+            alert_count = 0
 
     except Exception as e:
         print("Error:", e)
