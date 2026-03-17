@@ -7,7 +7,7 @@ import os
 # CONFIG
 # =========================
 
-URL = "https://visacatcher.bot/appointments/london/czech%20republic"
+URL = "https://visacatcher.bot/appointments/london/netherlands"
 
 CHECK_INTERVAL = 5  # seconds (safe for Railway)
 
