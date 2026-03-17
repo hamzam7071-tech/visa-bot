@@ -3,7 +3,7 @@ import time
 import os
 import smtplib
 
-URL = "https://visacatcher.bot/appointments/london/netherlands"
+URL = "https://visacatcher.bot/appointments/london/czech%20republic"
 
 # 🔔 ENV VARIABLES (set in Railway)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
