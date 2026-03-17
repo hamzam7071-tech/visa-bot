@@ -56,6 +56,9 @@ def check_available():
 
 print("🚀 Bot started...")
 
+
+send_email("TEST EMAIL WORKING")
+
 while True:
     try:
         if check_available():
